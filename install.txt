@@ -1,0 +1,47 @@
+Prometheus installation steps are listed below.
+
+1.	Add coreos helm repository.
+# helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+
+2.	Install Prometheus operator(Prometheus manager) with default yaml.
+# helm install coreos/prometheus-operator --name prometheus-operator --namespace monitoring
+
+3.	Install kube-prometheus(including exporter, alertmanager and grafana) with default yaml
+# helm install coreos/kube-prometheus --name kube-prometheus --namespace monitoring
+
+4.	Check if pods are ready.
+# kubectl get pod -n=monitoring
+NAME                                                                                   READY    STATUS RESTARTS AGE
+alertmanager-kube-prometheus-0                                         2/2       Running   0          3d
+kube-prometheus-exporter-kube-state-76f498d465-c92kb   2/2       Running   0          3d
+kube-prometheus-exporter-node-g5n5h                                1/1       Running   0          3d
+kube-prometheus-grafana-57d5b4d79f-975xm                     2/2       Running   0          3d
+prometheus-kube-prometheus-0                                            3/3       Running   1          3d
+prometheus-operator-d75587d6-nk5t4                                  1/1       Running   0          3d
+
+5.	Grafana port forwarding
+# kubectl edit svc kube-prometheus-grafana -n=monitoring
+(Change type from ClusterIP to NodePort, set nodePort 3000 and save file to take effect )
+After setting, open browser at http://localhost:3000, login with admin/admin, check out howbunbun grafana dashboard!
+
+(Optional) if you’d like to check Prometheus UI, forward Prometheus server.
+# kubectl edit svc kube-prometheus -n=monitoring
+(Change type from ClusterIP to NodePort, set nodePort 9090 and save file to take effect )
+You can query on metrics and see all the Prometheus targets via browsing http://localhost:9090
+
+
+
+
+Hi Zach,
+
+Estimated disk space is listed below.
+
+	retention_time_seconds	ingested_samples_per_second	bytes_per_sample (0.314MB)	Needed disk space
+1 day	86400	0.2 (per 5 sec)	329253	5425.92 MB
+	86400	0.033 (per 30sec)	329253	895.28 MB
+30 days	2592000	0.2 (per 5 sec)	329253	162777.67 MB
+	2592000	0.033 (per 30sec)	329253	26858.32 MB
+
+Regards,
+Evelyn
+
